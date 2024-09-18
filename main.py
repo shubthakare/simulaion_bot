@@ -33,6 +33,7 @@ import openai
 together_api_key =  os.getenv('TOGETHER_API')
 openai_api_key =  os.getenv('OPENAI_API') 
 openai.api_key = openai_api_key
+app_name =  os.getenv('USE_TOGETHER_API', "Valve chatbot") 
 
 def ask_together(prompt):
     try:
@@ -73,11 +74,11 @@ if os.path.exists(logo_path):
     with col1:
         st.image(logo_path, width=80)
     with col2:
-        st.title("Valve chatbot")
+        st.title(app_name)
     with col3:
         st.link_button("Contact Us", "https://www.cctech.co.in/contact-us#book-a-meet")
 else:
-    st.title("Valve chatbot")
+    st.title(app_name)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
