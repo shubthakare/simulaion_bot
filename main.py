@@ -34,10 +34,11 @@ together_api_key =  os.getenv('TOGETHER_API')
 openai_api_key =  os.getenv('OPENAI_API') 
 openai.api_key = openai_api_key
 
-app_name =  os.getenv('APP_NAME', "Valve chatbot") 
+app_name =  os.getenv('APP_NAME', "Valve Simulation Report Chatbot") 
 
-def ask_together(prompt):
+def ask_together(prompt, temperature, max_new_token):
     try:
+        print(temperature)
         client = openai.OpenAI(
             api_key=together_api_key,
             base_url="https://api.together.xyz/v1",
@@ -47,39 +48,50 @@ def ask_together(prompt):
             messages=[
                 {"role": "system", "content": f"You are an assistant that will help answer queries based on the following data {data}."},
                 {"role": "user", "content": prompt},
-            ]
+            ],
+            max_tokens=int(max_new_token),
+            temperature=temperature
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Error with Together API: {str(e)}"
 
-def ask_openai(prompt):
+def ask_openai(prompt, temperature, max_new_token):
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": f"You are a helpful assistant that will answer questions based on the following data. {data}"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=1000,
-            temperature=0.7
+            max_tokens=int(max_new_token),
+            temperature=temperature
         )
         return response.choices[0].message['content'].strip()
     except Exception as e:
         return f"Error with OpenAI API: {str(e)}"
     
 logo_path = 'CCTech white.png'
-
+st.set_page_config(page_title = "chatbot", page_icon="CCTech white.png", initial_sidebar_state="collapsed")
 if os.path.exists(logo_path):
-    col1, col2, col3 = st.columns([2, 9,4])  
+    col1, col2, col3, col4 = st.columns([2, 9, 3, 3])  
     with col1:
         st.image(logo_path, width=80)
     with col2:
         st.title(app_name)
     with col3:
-        st.link_button("Contact Us", "https://www.cctech.co.in/contact-us#book-a-meet")
+        st.link_button("Contact DT dept", "https://www.cctech.co.in/contact-us#book-a-meet")
+    with col4:
+        st.link_button("Contact Sim hub", "https://www.simulationhub.com/contact-us")
+
 else:
     st.title(app_name)
+
+with st.sidebar:
+    st.header("Parameter Settings")
+    temperature = st.slider('temperature', 0.1, 1.0, 0.70, step=0.1)
+    max_new_token = st.text_input('Max output length', 1000)
+
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -93,11 +105,10 @@ if prompt := st.chat_input("Ask me anything...."):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     if os.getenv('USE_TOGETHER_API', 'false').lower() == 'true':
-        response = ask_together(prompt)
+        response = ask_together(prompt, temperature, max_new_token)
     else:
-        response = ask_openai(prompt)
+        response = ask_openai(prompt, temperature, max_new_token)
 
     with st.chat_message("assistant"):
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
-
