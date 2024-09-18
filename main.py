@@ -65,8 +65,19 @@ def ask_openai(prompt):
         return response.choices[0].message['content'].strip()
     except Exception as e:
         return f"Error with OpenAI API: {str(e)}"
+    
+logo_path = 'CCTech white.png'
 
-st.title("Chat-bot")
+if os.path.exists(logo_path):
+    col1, col2, col3 = st.columns([2, 9,4])  
+    with col1:
+        st.image(logo_path, width=80)
+    with col2:
+        st.title("Valve chatbot")
+    with col3:
+        st.link_button("Contact Us", "https://www.cctech.co.in/contact-us#book-a-meet")
+else:
+    st.title("Valve chatbot")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -75,7 +86,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("Ask me anything...."):
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
