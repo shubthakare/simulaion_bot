@@ -32,7 +32,6 @@ import openai
 
 together_api_key =  os.getenv('TOGETHER_API')
 openai_api_key =  os.getenv('OPENAI_API') 
-
 openai.api_key = openai_api_key
 
 def ask_together(prompt):
