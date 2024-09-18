@@ -33,7 +33,8 @@ import openai
 together_api_key =  os.getenv('TOGETHER_API')
 openai_api_key =  os.getenv('OPENAI_API') 
 openai.api_key = openai_api_key
-app_name =  os.getenv('USE_TOGETHER_API', "Valve chatbot") 
+
+app_name =  os.getenv('APP_NAME', "Valve chatbot") 
 
 def ask_together(prompt):
     try:
